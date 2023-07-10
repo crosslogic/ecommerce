@@ -97,7 +97,7 @@ function updateShoppingCartTotal() {
     );
     total = total + shoppingCartItemPrice * shoppingCartItemQuantity;
   });
-  shoppingCartTotal.innerHTML = `${total.toFixed(2)}$`;
+  shoppingCartTotal.innerHTML = `$ ${total.toFixed(2)}`;
 }
 
 function removeShoppingCartItem(event) {
@@ -112,31 +112,43 @@ function quantityChanged(event) {
   updateShoppingCartTotal();
 }
 
+// Convierte los datos HTML a JSON
+function parsePedido() {
+  const shoppingCartItems = document.querySelectorAll(".shoppingCartItem");
+  console.log(shoppingCartItems);
+  const out = [];
+
+  shoppingCartItems.forEach((shoppingCartItem) => {
+    const item = {};
+    const priceEl = shoppingCartItem.querySelector(".shoppingCartItemPrice");
+    item.price = Number(priceEl.textContent.replace("$", ""));
+    const quantityEl = shoppingCartItem.querySelector(
+      ".shoppingCartItemQuantity"
+    );
+    item.quantity = Number(quantityEl.value);
+    out.push(item);
+  });
+
+  return out;
+}
+
 function comprarButtonClicked() {
   console.log("comprar button clicked");
-  $.post(
-    "/pedidos",
-    //"ahí van datos",
-    {
-      renglones: [
-        {
-          id: 21,
-          cantidad: 2,
-          monto: 300,
-        },
-        {
-          id: 34,
-          cantidad: 1,
-          monto: 100,
-        },
-      ],
-    },
-    (res) => {
+
+  // El POST envía un objeto JSON.
+  pedido = parsePedido();
+
+  //
+  axios
+    .post("/pedidos", pedido)
+    .then((res) => {
       shoppingCartItemsContainer.innerHTML = "";
       updateShoppingCartTotal();
       alert("Resultado: " + res);
-    }
-  );
+    })
+    .catch((err) => {
+      alert("Ocurrió un error procesando su pedido: " + String(err));
+    });
 }
 
 // Obtener el elemento del año actual

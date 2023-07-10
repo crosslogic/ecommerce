@@ -1,4 +1,4 @@
-require('dotenv').config()
+require("dotenv").config();
 const express = require("express");
 const port = 5000;
 
@@ -11,9 +11,15 @@ if (!cn) {
 console.log(`connecting to: ${cn}`);
 mongoose.connect(cn);
 console.log("connected");
+const pedidoSchema = new mongoose.Schema({
+  items: Array,
+  ts: String,
+  total: Number,
+});
+const Pedido = mongoose.model("Pedido", pedidoSchema);
 
 const app = express();
-app.use(express.urlencoded({ extended: false }));
+//app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Archivos estáticos
@@ -28,10 +34,26 @@ app.get("/", (req, res) => {
 app.get("/productos", (req, res) => {
   res.sendFile("pages/productos.html", { root: __dirname });
 });
-//
-// Productos
-app.post("/pedidos", (req, res) => {
+
+// Pedidos
+app.post("/pedidos", async (req, res) => {
   console.log("Entró pedido", req.body);
+  // Había datos?
+  if (!req.body) {
+    res.status(400).send("Pedido inválido");
+    return;
+  }
+  // Había items?
+  if (!req.body.length) {
+    res.status(400).send("El pedido no contenía ningún item");
+    return;
+  }
+  const pedido = {};
+  pedido.ts = new Date().toJSON();
+  pedido.items = req.body;
+  const model = new Pedido(pedido);
+  await model.save();
+
   res.send(req.body);
 });
 
