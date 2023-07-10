@@ -1,10 +1,16 @@
+require('dotenv').config()
 const express = require("express");
 const port = 5000;
 
 const mongoose = require("mongoose");
-mongoose.connect(
-  "mongodb+srv://user1:mayday5563@cluster0.o2b1t6q.mongodb.net/Cluster0?retryWrites=true&w=majority"
-);
+const cn = process.env.DB;
+if (!cn) {
+  throw new Error("missing env variable DB");
+}
+
+console.log(`connecting to: ${cn}`);
+mongoose.connect(cn);
+console.log("connected");
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
