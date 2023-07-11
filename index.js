@@ -1,13 +1,21 @@
+// Leo variables de entorno
 require("dotenv").config();
+
+// Inicio express
 const express = require("express");
 const port = 5000;
+const app = express();
+app.use(express.json());
 
+// Archivos estáticos
+app.use(express.static("static"));
+
+// Base de datos:
 const mongoose = require("mongoose");
 const cn = process.env.DB;
 if (!cn) {
   throw new Error("missing env variable DB");
 }
-
 console.log(`connecting to: ${cn}`);
 mongoose.connect(cn);
 console.log("connected");
@@ -18,12 +26,7 @@ const pedidoSchema = new mongoose.Schema({
 });
 const Pedido = mongoose.model("Pedido", pedidoSchema);
 
-const app = express();
-//app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
-// Archivos estáticos
-app.use(express.static("static"));
+// ROUTES:
 
 // Index
 app.get("/", (req, res) => {
