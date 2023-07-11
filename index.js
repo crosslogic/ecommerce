@@ -53,8 +53,13 @@ app.post("/pedidos", async (req, res) => {
   pedido.items = req.body;
   const model = new Pedido(pedido);
   await model.save();
+});
 
-  res.send(req.body);
+// Pedidos get
+app.get("/pedidos", async (req, res) => {
+  console.log("Entró solicitud pedido");
+  const pp = await Pedido.find();
+  res.send(pp);
 });
 
 // Contacto
